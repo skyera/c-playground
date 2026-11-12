@@ -32,4 +32,14 @@ UTEST(map, put_get_overwrite) {
     shfree(map);
 }
 
+UTEST(array, pop) {
+    int *arr = NULL;
+    arrput(arr, 7);
+    arrput(arr, 8);
+    ASSERT_EQ(8, arrpop(arr));
+    ASSERT_EQ(1, (int)arrlen(arr));
+    ASSERT_EQ(7, arr[0]);
+    arrfree(arr);
+}
+
 UTEST_MAIN()
