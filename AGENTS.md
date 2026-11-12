@@ -23,6 +23,23 @@ These rules add to the parent `/home/zliu/AGENTS.md` (research → plan → appr
 - Every allocation has exactly one owner and one `free`. Say who owns what.
 - No VLAs and no undefined behavior (signed overflow, out-of-bounds, uninitialized reads, use-after-free).
 
+## C coding style
+
+Match the existing code in `ds-demo/main.c`. Follow these when writing or reviewing code:
+
+- **Formatting:** 4 spaces, no tabs in `.c`/`.h` files (tabs are only for Makefile recipes). Lines ≤ 100 columns. One statement per line.
+- **Braces:** opening brace on the same line (K&R), including functions. Always use braces for `if`/`for`/`while` bodies that span more than one line.
+- **Naming:** `snake_case` for functions and variables, `UPPER_CASE` for macros and constants, `PascalCase` only for `typedef`'d struct names, as in `Entry`. Prefix public functions with the module name (`list_push`, not `push`).
+- **Declarations:** declare variables where first used, one per line, and initialize them. `static` for file-local functions and globals. Avoid mutable globals.
+- **`const` and types:** `const` on pointer parameters that are not modified. Use `size_t` for sizes and counts, `<stdint.h>` fixed-width types for sized data, and `bool` from `<stdbool.h>` for flags.
+- **Pointers:** write `char *name`, with the `*` next to the name. Initialize pointers to `NULL` and set them to `NULL` after `free`.
+- **Functions:** small, doing one thing. Return an error code or `NULL` on failure and document who frees what. Prefer early returns over deep nesting.
+- **Headers:** every `.h` has an include guard (`#ifndef MODULE_H` / `#define MODULE_H` / `#endif`). Include only what you use, and never define non-`static` variables or functions in headers (single-header libraries excepted).
+- **Macros:** avoid them when a `static inline` function works. Parenthesize macro arguments and the whole body.
+- **Comments:** explain why, not what. No commented-out code.
+- **Switch:** always include a `default` case, and mark intentional fall-through with a comment.
+- **Magic numbers:** name them with `enum` or `#define`.
+
 ## Build
 
 Default flags for every program and test:
