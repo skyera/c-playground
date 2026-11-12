@@ -1,8 +1,48 @@
+#include "stb_ds.h"
 #include "utest.h"
 #include "wf.h"
 
 UTEST(wf, version) {
     ASSERT_EQ(1, wf_version());
+}
+
+UTEST(tokenize, basic) {
+    char **w = wf_tokenize("Hello, World!");
+    ASSERT_EQ(2, (int)arrlen(w));
+    ASSERT_STREQ("hello", w[0]);
+    ASSERT_STREQ("world", w[1]);
+    wf_free_words(w);
+}
+
+UTEST(tokenize, empty_and_null) {
+    char **a = wf_tokenize("");
+    char **b = wf_tokenize(NULL);
+    ASSERT_EQ(0, (int)arrlen(a));
+    ASSERT_EQ(0, (int)arrlen(b));
+    wf_free_words(a);
+    wf_free_words(b);
+}
+
+UTEST(tokenize, only_separators) {
+    char **w = wf_tokenize("  ... ,, 123 !! ");
+    ASSERT_EQ(0, (int)arrlen(w));
+    wf_free_words(w);
+}
+
+UTEST(tokenize, lowercase) {
+    char **w = wf_tokenize("MiXeD CASE");
+    ASSERT_EQ(2, (int)arrlen(w));
+    ASSERT_STREQ("mixed", w[0]);
+    ASSERT_STREQ("case", w[1]);
+    wf_free_words(w);
+}
+
+UTEST(tokenize, repeats_and_newlines) {
+    char **w = wf_tokenize("a b\na\tb a");
+    ASSERT_EQ(5, (int)arrlen(w));
+    ASSERT_STREQ("a", w[0]);
+    ASSERT_STREQ("a", w[4]);
+    wf_free_words(w);
 }
 
 UTEST_MAIN()
