@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "utest.h"
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
 
@@ -8,31 +9,27 @@ typedef struct {
     int value;
 } Entry;
 
-int main(void) {
+UTEST(array, put_and_len) {
     int *arr = NULL;
     for (int i = 1; i <= 5; i++)
         arrput(arr, i * 10);
+    ASSERT_EQ(5, (int)arrlen(arr));
+    ASSERT_EQ(10, arr[0]);
+    ASSERT_EQ(50, arr[4]);
+    arrfree(arr);
+}
 
-    printf("array length: %td\n", arrlen(arr));
-    for (int i = 0; i < arrlen(arr); i++)
-        printf("arr[%d] = %d\n", i, arr[i]);
-
-    /* --- string-key hash map --- */
+UTEST(map, put_get_overwrite) {
     Entry *map = NULL;
+
     sh_new_strdup(map);
     shput(map, "apple", 3);
     shput(map, "banana", 7);
     shput(map, "apple", 4);
-
-    printf("apple = %d\n", shget(map, "apple"));
-    printf("banana = %d\n", shget(map, "banana"));
-    printf("map size: %td\n", shlen(map));
-
-    for (int i = 0; i < shlen(map); i++)
-        printf(" %s -> %d\n", map[i].key, map[i].value);
-
-    /* --- cleanup --- */
-    arrfree(arr);
+    ASSERT_EQ(2, (int)shlen(map));
+    ASSERT_EQ(4, shget(map, "apple"));
+    ASSERT_EQ(7, shget(map, "banana"));
     shfree(map);
-    return 0;
 }
+
+UTEST_MAIN()
