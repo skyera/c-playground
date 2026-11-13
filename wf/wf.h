@@ -20,4 +20,9 @@ typedef struct {
 WfCount *wf_count(char **words);
 void wf_free_counts(WfCount *counts);
 
+/* Return the entries of `counts` sorted by count (highest first), then by word (A-Z).
+ * The result is a stb_ds array of WfCount whose keys are BORROWED from `counts`:
+ * free it with arrfree() only, and do not use it after wf_free_counts(counts). */
+WfCount *wf_sorted(WfCount *counts);
+
 #endif

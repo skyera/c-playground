@@ -4,6 +4,7 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 int wf_version(void) {
     return 1;
@@ -62,4 +63,24 @@ WfCount *wf_count(char **words) {
 
 void wf_free_counts(WfCount *counts) {
     shfree(counts);
+}
+
+static int compare_counts(const void *a, const void *b) {
+    const WfCount *x = a;
+    const WfCount *y = b;
+    if (x->value != y->value) {
+        return (x->value < y->value) ? 1 : -1;
+    }
+    return strcmp(x->key, y->key);
+}
+
+WfCount *wf_sorted(WfCount *counts) {
+    WfCount *sorted = NULL;
+    for (ptrdiff_t i = 0; i < shlen(counts); i++) {
+        arrput(sorted, counts[i]);
+    }
+    if (arrlen(sorted) > 1) {
+        qsort(sorted, (size_t)arrlen(sorted), sizeof *sorted, compare_counts);
+    }
+    return sorted;
 }

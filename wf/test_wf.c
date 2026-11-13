@@ -87,4 +87,52 @@ UTEST(count, survives_freeing_words) {
     wf_free_counts(c);
 }
 
+UTEST(sorted, by_count_desc) {
+    char **w = wf_tokenize("a b a c b a");
+    WfCount *c = wf_count(w);
+    WfCount *s = wf_sorted(c);
+    ASSERT_EQ(3, (int)arrlen(s));
+    ASSERT_STREQ("a", s[0].key);
+    ASSERT_EQ(3, s[0].value);
+    ASSERT_STREQ("b", s[1].key);
+    ASSERT_STREQ("c", s[2].key);
+    arrfree(s);
+    wf_free_counts(c);
+    wf_free_words(w);
+}
+
+UTEST(sorted, ties_alphabetical) {
+    char **w = wf_tokenize("pear apple banana");
+    WfCount *c = wf_count(w);
+    WfCount *s = wf_sorted(c);
+    ASSERT_EQ(3, (int)arrlen(s));
+    ASSERT_STREQ("apple", s[0].key);
+    ASSERT_STREQ("banana", s[1].key);
+    ASSERT_STREQ("pear", s[2].key);
+    arrfree(s);
+    wf_free_counts(c);
+    wf_free_words(w);
+}
+
+UTEST(sorted, count_then_alpha) {
+    char **w = wf_tokenize("b b a a c");
+    WfCount *c = wf_count(w);
+    WfCount *s = wf_sorted(c);
+    ASSERT_EQ(3, (int)arrlen(s));
+    ASSERT_STREQ("a", s[0].key);
+    ASSERT_STREQ("b", s[1].key);
+    ASSERT_STREQ("c", s[2].key);
+    arrfree(s);
+    wf_free_counts(c);
+    wf_free_words(w);
+}
+
+UTEST(sorted, empty) {
+    WfCount *c = wf_count(NULL);
+    WfCount *s = wf_sorted(c);
+    ASSERT_EQ(0, (int)arrlen(s));
+    arrfree(s);
+    wf_free_counts(c);
+}
+
 UTEST_MAIN()
