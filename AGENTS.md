@@ -76,6 +76,13 @@ Default flags for every program and test:
 - Never commit build artifacts (`demo`, `test_*`, `*.o`). Check `git status --short` before committing.
 - Commit message: short imperative subject. Proofread it. Use `git commit --amend` for local typos.
 - Commit locally when told "commit". Push only when told "push". Rewriting pushed history needs explicit approval, and prefer `--force-with-lease`.
+- **"ship" or "doit"** (one word) means commit **and** push to the remote in one go. Do this:
+  1. Run `git status --short -uall` and review what changed. If an unexpected file or a build artifact appears, stop and ask.
+  2. Run `make test` in each affected project directory. If anything fails or warns, stop and report. Do not commit.
+  3. Stage only the intended files by name (no `git add -A`) and commit with a short imperative message plus the co-author trailer.
+  4. Run a normal `git push origin <current branch>`. Never force-push on "ship" or "doit". If the push is rejected, stop and report.
+  5. Report the commit hash, `git status -sb`, and `git log --oneline -3`.
+- "ship" and "doit" apply to the work done so far in the session, not to later changes. The two-word "do it" keeps its meaning from the parent `AGENTS.md`: approve and implement, with no commit or push.
 
 ## Common pitfalls to call out
 
