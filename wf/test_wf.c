@@ -45,4 +45,46 @@ UTEST(tokenize, repeats_and_newlines) {
     wf_free_words(w);
 }
 
+UTEST(count, repeats) {
+    char **w = wf_tokenize("a b a c b a");
+    WfCount *c = wf_count(w);
+    ASSERT_EQ(3, (int)shlen(c));
+    ASSERT_EQ(3, shget(c, "a"));
+    ASSERT_EQ(2, shget(c, "b"));
+    ASSERT_EQ(1, shget(c, "c"));
+    wf_free_words(w);
+    wf_free_counts(c);
+}
+
+UTEST(count, empty) {
+    WfCount *c = wf_count(NULL);
+    ASSERT_EQ(0, (int)shlen(c));
+    wf_free_counts(c);
+}
+
+UTEST(count, missing_word) {
+    char **w = wf_tokenize("apple");
+    WfCount *c = wf_count(w);
+    ASSERT_TRUE(shgeti(c, "banana") < 0);
+    wf_free_words(w);
+    wf_free_counts(c);
+}
+
+UTEST(count, case_insensitive) {
+    char **w = wf_tokenize("The the THE");
+    WfCount *c = wf_count(w);
+    ASSERT_EQ(1, (int)shlen(c));
+    ASSERT_EQ(3, shget(c, "the"));
+    wf_free_words(w);
+    wf_free_counts(c);
+}
+
+UTEST(count, survives_freeing_words) {
+    char **w = wf_tokenize("keep keep");
+    WfCount *c = wf_count(w);
+    wf_free_words(w);
+    ASSERT_EQ(2, shget(c, "keep"));
+    wf_free_counts(c);
+}
+
 UTEST_MAIN()

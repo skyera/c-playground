@@ -49,3 +49,17 @@ char **wf_tokenize(const char *text) {
     }
     return words;
 }
+
+WfCount *wf_count(char **words) {
+    WfCount *counts = NULL;
+    sh_new_strdup(counts);
+    for (ptrdiff_t i = 0; i < arrlen(words); i++) {
+        int n = shget(counts, words[i]);
+        shput(counts, words[i], n + 1);
+    }
+    return counts;
+}
+
+void wf_free_counts(WfCount *counts) {
+    shfree(counts);
+}
