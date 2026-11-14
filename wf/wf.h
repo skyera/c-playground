@@ -1,7 +1,6 @@
 #ifndef WF_H
 #define WF_H
-
-int wf_version(void);
+#include <stdio.h>
 
 /* Split text into lowercase ASCII words (runs of letters).
  * Returns a stb_ds array of malloc'd strings; NULL if there are none.
@@ -24,5 +23,9 @@ void wf_free_counts(WfCount *counts);
  * The result is a stb_ds array of WfCount whose keys are BORROWED from `counts`:
  * free it with arrfree() only, and do not use it after wf_free_counts(counts). */
 WfCount *wf_sorted(WfCount *counts);
+
+/* Read all of `fp` into a NUL-terminated malloc'd string.
+ * Returns NULL on read or allocation failure. The caller frees it with free(). */
+char *wf_read_all(FILE *fp);
 
 #endif

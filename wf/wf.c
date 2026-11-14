@@ -6,10 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-int wf_version(void) {
-    return 1;
-}
-
 void wf_free_words(char **words) {
     for (ptrdiff_t i = 0; i < arrlen(words); i++) {
         free(words[i]);
@@ -83,4 +79,34 @@ WfCount *wf_sorted(WfCount *counts) {
         qsort(sorted, (size_t)arrlen(sorted), sizeof *sorted, compare_counts);
     }
     return sorted;
+}
+
+char *wf_read_all(FILE *fp) {
+    size_t cap = 4096;
+    size_t len = 0;
+    char *buf = malloc(cap);
+    if (buf == NULL) {
+        return NULL;
+    }
+
+    for (;;) {
+        len += fread(buf + len, 1, cap - len - 1, fp);
+        if (len < cap - 1) {
+            break;
+        }
+        cap *= 2;
+        char *bigger = realloc(buf, cap);
+        if (bigger == NULL) {
+            free(buf);
+            return NULL;
+        }
+        buf = bigger;
+    }
+
+    if (ferror(fp)) {
+        free(buf);
+        return NULL;
+    }
+    buf[len] = '\0';
+    return buf;
 }

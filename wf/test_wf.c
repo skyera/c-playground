@@ -1,10 +1,8 @@
 #include "stb_ds.h"
+#include <stdlib.h>
+#include <string.h>
 #include "utest.h"
 #include "wf.h"
-
-UTEST(wf, version) {
-    ASSERT_EQ(1, wf_version());
-}
 
 UTEST(tokenize, basic) {
     char **w = wf_tokenize("Hello, World!");
@@ -133,6 +131,52 @@ UTEST(sorted, empty) {
     ASSERT_EQ(0, (int)arrlen(s));
     arrfree(s);
     wf_free_counts(c);
+}
+
+static FILE *tmp_with(const char *text, size_t len) {
+    FILE *fp = tmpfile();
+    if (fp != NULL) {
+        fwrite(text, 1, len, fp);
+        rewind(fp);
+    }
+    return fp;
+}
+
+UTEST(read_all, small) {
+    FILE *fp = tmp_with("hello", 5);
+    ASSERT_TRUE(fp != NULL);
+    char *s = wf_read_all(fp);
+    ASSERT_TRUE(s != NULL);
+    ASSERT_STREQ("hello", s);
+    free(s);
+    fclose(fp);
+}
+
+UTEST(read_all, empty) {
+    FILE *fp = tmp_with("", 0);
+    ASSERT_TRUE(fp != NULL);
+    char *s = wf_read_all(fp);
+    ASSERT_TRUE(s != NULL);
+    ASSERT_EQ(0, (int)strlen(s));
+    free(s);
+    fclose(fp);
+}
+
+UTEST(read_all, boundary_and_large) {
+    size_t sizes[] = {4094, 4095, 4096, 10000};
+    for (size_t k = 0; k < sizeof sizes / sizeof sizes[0]; k++) {
+        char *text = malloc(sizes[k]);
+        ASSERT_TRUE(text != NULL);
+        memset(text, 'a', sizes[k]);
+        FILE *fp = tmp_with(text, sizes[k]);
+        ASSERT_TRUE(fp != NULL);
+        char *s = wf_read_all(fp);
+        ASSERT_TRUE(s != NULL);
+        EXPECT_EQ(sizes[k], strlen(s));
+        free(s);
+        fclose(fp);
+        free(text);
+    }
 }
 
 UTEST_MAIN()
